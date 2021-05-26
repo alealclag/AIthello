@@ -1,0 +1,628 @@
+;Aqui definimos una funcion por cada direccion posible en que la que pueda haber un movimiento valido, hay una por cada direccion y dos de cada tipo, para blancas o negras.
+;Se han dividido para que este mas ordenado y sea mas simple a la hora de entenderlo para el usuario.
+;Todas las funciones trabajan de la misma forma por lo que vamos a definir como funcionan de manera general.
+;En primer lugar cogemos todas las fichas (del color contrario) que sean vecinas de nuestras fichas, para cada par creamos una direccion, que nos indicara en que direccion, valga la
+;redundancia, debemos iterar para comprobar si hay movimiento valido.
+;Con esto iniciamos un bucle que empieza con la primera ficha que se encuentre una posicion mas alla (en la direccion que estemos mirando) de nuestra primera ficha "enemiga",
+;El bucle empieza comprobando si no hay ficha en la posicion en la que este mirando, en ese caso crearia la ficha vacia puesto que seria un movimiento valido. En el caso de que hubiera
+;una ficha, ya sea de nuestro color o vacia, parariamos el bucle porque eso demostraria que no es un movimiento valido.
+;Al iniciar el bucle comprobamos si la posicion en la que vamos a buscar esta dentro de los limites del tablero y al finalizar el bucle incrementamos el valor de las coordenadas que sea
+;necesario incrementar en ese momento, ya que para direcciones verticales y horizontales solo cambia una coordenada.
+;Las variables res estan para que no se vuelva a entrar en el bucle en caso de haber encontrado un movimiento valido, o en caso de no haberlo encontrado.
+;Estas funciones no devuelven nada, simplemente crean o no la ficha vacia.
+to vertical-arriba-negras
+  ask negras [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? blancas-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse dirx = 0 and diry < 0 [
+        let h y + 1
+        let res1 false
+        loop [
+          ifelse(h = -8 or h = 1 or res1)[stop][
+          ask patches with[pycor = h and pxcor = x][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasNegra 1
+              set res1 true
+              stop
+            ]any? vaciasNegra-on self[
+                set res1 true
+                stop
+            ]any? negras-on self[
+                set res1 true
+                stop
+            ])
+          ]
+          if(res1)[stop]
+          set h h + 1
+            ]
+          ]
+        stop
+        ][stop]
+      ]
+    ]
+end
+
+to diagonal-arriba-derecha-negras
+  ask negras [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? blancas-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse dirx > 0 and diry < 0[
+        let h y + 1
+        let w x + 1
+        let res2 false
+        loop [
+          ifelse(h = -8 or h = 1 or w = 8 or w = -1 or res2)[stop][
+          ask patches with[pycor = h and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasNegra 1
+              set res2 true
+              stop
+            ]any? vaciasNegra-on self[
+                set res2 true
+                stop
+            ]any? negras-on self[
+                set res2 true
+                stop
+            ])
+          ]
+          if(res2)[stop]
+          set h h + 1
+          set w w + 1
+          ]
+         ]
+        stop
+        ][stop]
+      ]
+    ]
+end
+
+to horizontal-derecha-negras
+  ask negras [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? blancas-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry = 0 and dirx > 0[
+        let w x + 1
+        let res3 false
+        loop [
+          ifelse(w = 8 or w = -1 or res3)[stop][
+          ask patches with[pycor = y and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasNegra 1
+              set res3 true
+              stop
+            ]any? vaciasNegra-on self[
+                set res3 true
+                stop
+            ]any? negras-on self[
+                set res3 true
+                stop
+            ])
+            ]
+          ]
+          if(res3)[stop]
+          set w w + 1
+        ]
+        stop
+        ][stop]
+      ]
+    ]
+end
+
+to diagonal-abajo-derecha-negras
+  ask negras [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? blancas-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry > 0 and dirx > 0[
+        let h y - 1
+        let w x + 1
+        let res4 false
+        loop [
+          ifelse(h = -8 or h = 1 or w = 8 or w = -1 or res4)[stop][;;;;;;;;;;;;;;;;;;;;;;;;
+          ask patches with[pycor = h and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasNegra 1
+              set res4 true
+              stop
+            ]any? vaciasNegra-on self[
+                set res4 true
+                stop
+            ]any? negras-on self[
+                set res4 true
+                stop
+            ])
+          ]
+          ]
+          if(res4)[stop]
+          set h h - 1
+          set w w + 1
+          ]
+       ][stop]
+      ]
+    stop
+    ]
+end
+
+to vertical-abajo-negras
+  ask negras [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? blancas-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry > 0 and dirx = 0[
+        let h y - 1
+        let res5 false
+        loop [
+          ifelse(h = -8 or h = 1 or res5)[stop][
+          ask patches with[pycor = h and pxcor = x][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasNegra 1
+              set res5 true
+              stop
+            ]any? vaciasNegra-on self[
+                set res5 true
+                stop
+            ]any? negras-on self[
+                set res5 true
+                stop
+            ])
+          ]
+
+          if(res5)[stop]
+          set h h - 1
+          ]
+       ]
+        stop
+       ][stop]
+      ]
+    ]
+end
+
+to diagonal-abajo-izquierda-negras
+  ask negras [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? blancas-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry > 0 and dirx < 0[
+        let h y - 1
+        let w x - 1
+        let res6 false
+        loop [
+          ifelse(h = -8 or h = 1 or w = 8 or w = -1 or res6)[stop][
+          ask patches with[pycor = h and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasNegra 1
+              set res6 true
+              stop
+            ]any? vaciasNegra-on self[
+                set res6 true
+                stop
+            ]any? negras-on self[
+                set res6 true
+                stop
+            ])
+          ]
+
+          if(res6)[stop]
+          set h h - 1
+          set w w - 1
+          ]
+       ]
+        stop
+       ][stop]
+      ]
+    ]
+end
+
+to horizontal-izquierda-negras
+  ask negras [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? blancas-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry = 0 and dirx < 0[
+        let w x - 1
+        let res7 false
+        loop [
+          ifelse(w = 8 or w = -1 or res7)[stop][
+          ask patches with[pycor = y and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasNegra 1
+              set res7 true
+              stop
+            ]any? vaciasNegra-on self[
+                set res7 true
+                stop
+            ]any? negras-on self[
+                set res7 true
+                stop
+            ])
+          ]
+
+          if(res7)[stop]
+          set w w - 1
+          ]
+       ]
+        stop
+       ][stop]
+      ]
+    ]
+end
+
+to diagonal-izquierda-arriba-negras
+  ask negras [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? blancas-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry < 0 and dirx < 0[
+        let h y + 1
+        let w x - 1
+        let res8 false
+        loop [
+          ifelse(h = -8 or h = 1 or w = 8 or w = -1 or res8)[stop][
+          ask patches with[pycor = h and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasNegra 1
+              set res8 true
+              stop
+            ]any? vaciasNegra-on self[
+                set res8 true
+                stop
+            ]any? negras-on self[
+                set res8 true
+                stop
+            ])
+          ]
+          if(res8)[stop]
+          set h h + 1
+          set w w - 1
+        ]
+        ]
+        stop
+       ][stop]
+      ]
+    ]
+end
+
+
+
+
+to vertical-arriba-blancas
+  ask blancas [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? negras-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse dirx = 0 and diry < 0 [
+        let h y + 1
+        let res1 false
+        loop [
+          ifelse(h = -8 or h = 1 or res1)[stop][
+          ask patches with[pycor = h and pxcor = x][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasBlanca 1
+              set res1 true
+              stop
+            ]any? vaciasBlanca-on self[
+                set res1 true
+                stop
+            ]any? blancas-on self[
+                set res1 true
+                stop
+            ])
+          ]
+          if(res1)[stop]
+          set h h + 1
+            ]
+          ]
+        stop
+        ][stop]
+      ]
+    ]
+end
+
+to diagonal-arriba-derecha-blancas
+  ask blancas [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? negras-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse dirx > 0 and diry < 0[
+        let h y + 1
+        let w x + 1
+        let res2 false
+        loop [
+          ifelse(h = -8 or h = 1 or w = 8 or w = -1 or res2)[stop][
+          ask patches with[pycor = h and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasBlanca 1
+              set res2 true
+              stop
+            ]any? vaciasBlanca-on self[
+                set res2 true
+                stop
+            ]any? blancas-on self[
+                set res2 true
+                stop
+            ])
+          ]
+          if(res2)[stop]
+          set h h + 1
+          set w w + 1
+          ]
+         ]
+        stop
+        ][stop]
+      ]
+    ]
+end
+
+to horizontal-derecha-blancas
+  ask blancas [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? negras-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry = 0 and dirx > 0[
+        let w x + 1
+        let res3 false
+        loop [
+          ifelse(w = 8 or w = -1 or res3)[stop][
+          ask patches with[pycor = y and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasBlanca 1
+              set res3 true
+              stop
+            ]any? vaciasBlanca-on self[
+                set res3 true
+                stop
+            ]any? blancas-on self[
+                set res3 true
+                stop
+            ])
+            ]
+          ]
+          if(res3)[stop]
+          set w w + 1
+        ]
+        stop
+        ][stop]
+      ]
+    ]
+end
+
+to diagonal-abajo-derecha-blancas
+  ask blancas [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? negras-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry > 0 and dirx > 0[
+        let h y - 1
+        let w x + 1
+        let res4 false
+        loop [
+          ifelse(h = -8 or h = 1 or w = 8 or w = -1 or res4)[stop][;;;;;;;;;;;;;;;;;;;;;;;;
+          ask patches with[pycor = h and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasBlanca 1
+              set res4 true
+              stop
+            ]any? vaciasBlanca-on self[
+                set res4 true
+                stop
+            ]any? blancas-on self[
+                set res4 true
+                stop
+            ])
+          ]
+          ]
+          if(res4)[stop]
+          set h h - 1
+          set w w + 1
+          ]
+       ][stop]
+      ]
+    stop
+    ]
+end
+
+to vertical-abajo-blancas
+  ask blancas [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? negras-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry > 0 and dirx = 0[
+        let h y - 1
+        let res5 false
+        loop [
+          ifelse(h = -8 or h = 1 or res5)[stop][
+          ask patches with[pycor = h and pxcor = x][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasBlanca 1
+              set res5 true
+              stop
+            ]any? vaciasBlanca-on self[
+                set res5 true
+                stop
+            ]any? blancas-on self[
+                set res5 true
+                stop
+            ])
+          ]
+
+          if(res5)[stop]
+          set h h - 1
+          ]
+       ]
+        stop
+       ][stop]
+      ]
+    ]
+end
+
+to diagonal-abajo-izquierda-blancas
+  ask blancas [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? negras-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry > 0 and dirx < 0[
+        let h y - 1
+        let w x - 1
+        let res6 false
+        loop [
+          ifelse(h = -8 or h = 1 or w = 8 or w = -1 or res6)[stop][
+          ask patches with[pycor = h and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasBlanca 1
+              set res6 true
+              stop
+            ]any? vaciasBlanca-on self[
+                set res6 true
+                stop
+            ]any? blancas-on self[
+                set res6 true
+                stop
+            ])
+          ]
+
+          if(res6)[stop]
+          set h h - 1
+          set w w - 1
+          ]
+       ]
+        stop
+       ][stop]
+      ]
+    ]
+end
+
+to horizontal-izquierda-blancas
+  ask blancas [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? negras-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry = 0 and dirx < 0[
+        let w x - 1
+        let res7 false
+        loop [
+          ifelse(w = 8 or w = -1 or res7)[stop][
+          ask patches with[pycor = y and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasBlanca 1
+              set res7 true
+              stop
+            ]any? vaciasBlanca-on self[
+                set res7 true
+                stop
+            ]any? blancas-on self[
+                set res7 true
+                stop
+            ])
+          ]
+
+          if(res7)[stop]
+          set w w - 1
+          ]
+       ]
+        stop
+       ][stop]
+      ]
+    ]
+end
+
+to diagonal-izquierda-arriba-blancas
+  ask blancas [
+    let x pxcor
+    let y pycor
+    ask neighbors with[any? negras-on self][
+      let i pxcor
+      let j pycor
+      let dirx i - x
+      let diry (-1) * j - (-1) * y
+      ifelse diry < 0 and dirx < 0[
+        let h y + 1
+        let w x - 1
+        let res8 false
+        loop [
+          ifelse(h = -8 or h = 1 or w = 8 or w = -1 or res8)[stop][
+          ask patches with[pycor = h and pxcor = w][
+            (ifelse (not any? negras-on self) and (not any? blancas-on self)[
+              sprout-vaciasBlanca 1
+              set res8 true
+              stop
+            ]any? vaciasBlanca-on self[
+                set res8 true
+                stop
+            ]any? blancas-on self[
+                set res8 true
+                stop
+            ])
+          ]
+          if(res8)[stop]
+          set h h + 1
+          set w w - 1
+        ]
+        ]
+        stop
+       ][stop]
+      ]
+    ]
+end
